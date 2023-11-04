@@ -3,7 +3,25 @@ body {
     background-repeat: repeat;
     padding: 10px;
 
+
+    /* COLORS */
+    --primaryColor: #0e7c7b;
+    --secondaryColor: #141414;
+    --tertiaryColor: #f6ae2d;
+    --quaternaryColor: #f26419;
+    --quinaryColor: #000300;
+
+    /* VARIABLES */
+
     --topBarHeight: 40px;
+    --pannelsBackgroundColor: var(--secondaryColor);
+    --canvasBackgroundColor: var(--primaryColor);
+}
+
+.settings,
+.buttons,
+.canvas {
+    border: 1px solid var(--primaryColor);
 }
 
 .ihatebootstrap {
@@ -19,11 +37,18 @@ body {
 .canvas {
     width: 100%;
     height: 100%;
-    background-color: white;
 }
 
 .buttons {
     width: 100%;
     height: var(--topBarHeight);
-    background-color: white;
+}
+
+.canvas {
+    background-color: var(--canvasBackgroundColor);
+}
+
+.settings, 
+.buttons {
+    background-color: var(--pannelsBackgroundColor);
 }
