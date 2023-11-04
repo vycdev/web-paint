@@ -1,0 +1,29 @@
+body {
+    background: url("imgs/background.png");
+    background-repeat: repeat;
+    padding: 10px;
+
+    --topBarHeight: 40px;
+}
+
+.ihatebootstrap {
+    height: calc(100% - (var(--topBarHeight) + 25px));
+}
+
+.settingsContainer, 
+.canvasContainer {
+    height: 100%;
+}
+
+.settings, 
+.canvas {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+.buttons {
+    width: 100%;
+    height: var(--topBarHeight);
+    background-color: white;
+}
