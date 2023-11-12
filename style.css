@@ -18,6 +18,21 @@ body {
     --canvasBackgroundColor: var(--primaryColor);
 }
 
+.noselect {
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Safari */
+    -khtml-user-select: none;
+    /* Konqueror HTML */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+  
 .settings,
 .buttons,
 .canvas {
@@ -70,10 +85,25 @@ body {
 }
 
 .canvas {
-    background-color: var(--canvasBackgroundColor);
+    background-color: white;
 }
 
 .settings, 
 .buttons {
     background-color: var(--pannelsBackgroundColor);
+}
+
+#colorBox {
+    display: inline-flex;
+    height: 24px;
+    width: 24px;
+    border: 2px solid white;
+    background: black;
+    margin-bottom: -2px;
+    margin-left: 5px;   
+}
+
+
+.settingsContainer {
+    color: white;
 }

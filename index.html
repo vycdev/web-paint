@@ -59,9 +59,17 @@
                             id="canvasReset"
                             title="Click to reset canvas."
                         ></i>
+                        <div id="colorBox"></div>
 
-                        <i class="fa-solid fa-file-arrow-up"></i>
-                        <i class="fa-solid fa-file-arrow-up"></i>
+                        <i
+                            class="fa-solid fa-file-arrow-up"
+                            id="uploadImg"
+                            title="Click to upload an image."
+                        ></i>
+                        <i
+                            class="fa-solid fa-file-arrow-down"
+                            id="downloadImg"
+                        ></i>
                     </div>
                 </div>
                 <div class="canvasContainer col-9">
@@ -71,8 +79,46 @@
                         style="cursor: url('cursor/crosshair.cur'), auto"
                     />
                 </div>
-                <div class="settingsContainer col-3">
-                    <div class="settings"></div>
+                <div class="settingsContainer noselect col-3">
+                    <div class="settings">
+                        <div class="controlPannel">
+                            <div class="controlPannelTitle noselect">
+                                Options
+                            </div>
+                            <div class="noselect">
+                                <div id="brushSizeInput">
+                                    <p>Choose brush size</p>
+                                    <input
+                                        id="rangeInput"
+                                        type="range"
+                                        min="1"
+                                        max="100"
+                                        value="10"
+                                    />
+                                    <input
+                                        id="numberInput"
+                                        type="text"
+                                        value="10px"
+                                        readonly
+                                    />
+                                </div>
+                                <div class="rainbowOptions">
+                                    <p>Rainbow brush</p>
+                                    <input
+                                        type="checkbox"
+                                        id="rainbowCheckbox"
+                                        value="false"
+                                    />
+                                    <input
+                                        type="numberInput"
+                                        id="valueSpeedBox"
+                                        style="display: none"
+                                        value="8"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -88,4 +134,8 @@
             </div>
         </div>
     </body>
+
+    <footer>
+        <script src="site.js"></script>
+    </footer>
 </html>
