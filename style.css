@@ -7,7 +7,7 @@ body {
     /* COLORS */
     --primaryColor: #0e7c7b;
     --secondaryColor: #141414;
-    --tertiaryColor: #f6ae2d;
+    --tertiaryColor: #ffce74;
     --quaternaryColor: #f26419;
     --quinaryColor: #000300;
 
@@ -42,6 +42,31 @@ body {
 .buttons {
     width: 100%;
     height: var(--topBarHeight);
+    color: white;
+    font-size: 24px;
+    display: flex; 
+    align-items: center;
+}
+
+.buttons i {
+    padding: 0 5px;    
+}
+
+.buttons:first-child {
+    padding-left: 10px;
+}
+
+.buttons i:last-child {
+    margin-right: 10px;
+}
+
+.buttons i:nth-last-child(2) {
+    margin-left: auto;
+}
+
+.buttons i:hover {
+    color: var(--tertiaryColor);
+    cursor: pointer; 
 }
 
 .canvas {

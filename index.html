@@ -7,6 +7,10 @@
 
         <script src="https://kit.fontawesome.com/eae866a828.js"></script>
         <script src="https://unpkg.com/vanilla-picker@2"></script>
+        <script
+            src="https://kit.fontawesome.com/eae866a828.js"
+            crossorigin="anonymous"
+        ></script>
 
         <link
             rel="stylesheet"
@@ -24,14 +28,63 @@
         <div class="container-fluid vh-100 overflow-hidden">
             <div class="row g-1 gy-1 ihatebootstrap">
                 <div class="buttonsContainer col-12">
-                    <div class="buttons"></div>
+                    <div class="buttons">
+                        <i
+                            class="fa-solid fa-paintbrush"
+                            id="brush"
+                            title="Brush. Click for more options."
+                        ></i>
+                        <i
+                            class="fa-solid fa-eraser"
+                            id="eraser"
+                            title="Eraser"
+                        ></i>
+                        <i
+                            class="fa-solid fa-palette"
+                            id="colorPicker"
+                            title="Click to select a color."
+                        ></i>
+                        <i
+                            class="fa-solid fa-eye-dropper"
+                            id="pickColor"
+                            title="Click on the canvas to pick a color."
+                        ></i>
+                        <i
+                            class="fa-solid fa-bucket"
+                            id="bucket"
+                            title="Click to use fill bucket."
+                        ></i>
+                        <i
+                            class="fa-solid fa-rotate-right"
+                            id="canvasReset"
+                            title="Click to reset canvas."
+                        ></i>
+
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                    </div>
                 </div>
                 <div class="canvasContainer col-9">
-                    <canvas class="canvas" />
+                    <canvas
+                        class="canvas"
+                        id="canvas"
+                        style="cursor: url('cursor/crosshair.cur'), auto"
+                    />
                 </div>
                 <div class="settingsContainer col-3">
                     <div class="settings"></div>
                 </div>
+            </div>
+        </div>
+
+        <div id="uploadImage" style="display: none">
+            <div id="closeUploadBox"><i class="far fa-times-circle"></i></div>
+            <div class="uploadBoxContent">
+                <input type="file" id="fileInput" accept="image/*" />
+                <p>Select an image to upload.</p>
+                <p>The image will be scaled to the resolution of the canvas.</p>
+                <p>Warning: the current canvas will be deleted.</p>
+                <button type="submit" id="submitImage">Submit</button>
             </div>
         </div>
     </body>
