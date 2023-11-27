@@ -13,6 +13,8 @@
 
 // ========== ELEMENTS ==========
 
+let undoButton = document.getElementById("undo");
+let redoButton = document.getElementById("redo");
 let brushSizeInput = document.getElementById("brushSizeInput");
 let brushElement = document.getElementById("brush");
 let rangeInput = document.getElementById("rangeInput");
@@ -41,9 +43,11 @@ let picker = new Picker({
 });
 
 // ========== VARIABLES ==========
+const MAX_UNDOS = 25;
+
 let rgbaColor = "rgba(0,0,0,1)"; ///Selected rgba color in string format
 let brushSize = "10"; /// brush size in string format
-let brushType = "brush"; /// brush type (brush.eraser.bucket,colorPick)
+let brushType = "brush"; /// brush type (brush, eraser, bucket, colorPick)
 let rgbaArr = [0, 0, 0, 1]; //// current selected rgba color in array format
 let isDone = true;
 
@@ -65,6 +69,9 @@ let scales = {
     x: sizes.width / initialSizes.width,
     y: sizes.height / initialSizes.height,
 };
+
+let canvasStateIndex = 0;
+let canvasStates = [];
 
 // ========== FUNCTIONS ==========
 
@@ -323,6 +330,7 @@ function Draw(x, y, isDown, brushType, bucketReady) {
 
 function init() {
     let bucketReady;
+
     canvas.onmousedown = (e) => {
         mousePressed = true;
         if (isDone) {
@@ -336,6 +344,7 @@ function init() {
             bucketReady
         );
     };
+
     canvas.onmousemove = (e) => {
         if (mousePressed) {
             bucketReady = false;
@@ -361,13 +370,23 @@ function init() {
             );
         }
     };
+
     canvas.onmouseup = () => {
         mousePressed = false;
         if (isDone) {
             bucketReady = true;
         }
+
+        if (brushType !== "colorPick") {
+            saveState();
+        }
     };
+
     canvas.onmouseout = () => {
+        if (brushType !== "colorPick" && mousePressed == true) {
+            saveState();
+        }
+
         bucketReady = false;
         mousePressed = false;
     };
@@ -421,7 +440,78 @@ function downloadImage() {
     downImg.href = convertCanvasToImage(canvas).src;
 }
 
+// UNDO / REDO
+function saveState() {
+    if (canvasStateIndex > 0) {
+        canvasStates.splice(
+            canvasStates.length - canvasStateIndex,
+            canvasStateIndex
+        );
+    }
+
+    if (canvasStates.length > 0) {
+        if (canvasStates[canvasStates.length - 1].src != canvas.toDataURL()) {
+            canvasStates.push(convertCanvasToImage(canvas));
+        }
+    } else canvasStates.push(convertCanvasToImage(canvas));
+
+    if (canvasStates.length > MAX_UNDOS) {
+        canvasStates.shift();
+    }
+
+    canvasStateIndex = 0;
+
+    console.log(canvasStateIndex, canvasStates);
+}
+
+function undo() {
+    if (canvasStates.length > 1) {
+        canvasStates[canvasStates.length - (2 + canvasStateIndex)] &&
+            ctx.drawImage(
+                canvasStates[canvasStates.length - (2 + canvasStateIndex)],
+                0,
+                0,
+                canvas.width / scales.x,
+                canvas.height / scales.y
+            );
+
+        canvasStateIndex++;
+        if (canvasStateIndex > canvasStates.length - 1) {
+            canvasStateIndex = canvasStates.length - 1;
+        }
+    }
+
+    console.log(canvasStateIndex, canvasStates);
+}
+
+function redo() {
+    if (canvasStates.length > 1) {
+        canvasStateIndex--;
+        if (canvasStateIndex < 0) {
+            canvasStateIndex = 0;
+        }
+
+        ctx.drawImage(
+            canvasStates[canvasStates.length - (1 + canvasStateIndex)],
+            0,
+            0,
+            canvas.width / scales.x,
+            canvas.height / scales.y
+        );
+    }
+
+    console.log(canvasStateIndex, canvasStates);
+}
+
 // ========== EVENTS ==========
+
+// UNDO / REDO
+undoButton.onclick = () => {
+    undo();
+};
+redoButton.onclick = () => {
+    redo();
+};
 
 window.onresize = () => {
     initialSizes = {
@@ -441,6 +531,7 @@ window.onresize = () => {
 
 ///Reset canvas button
 reset.onclick = () => {
+    saveState();
     drawCanvas();
 };
 
@@ -458,6 +549,7 @@ uploadImg.onclick = () => {
 
 submitButton.onclick = () => {
     if (fileInput.files[0]) {
+        saveState();
         convertImageToCanvas(fileInput.files);
     } else {
         alert("Please select an image");
@@ -529,4 +621,5 @@ valueSpeedBox.onchange = () => {
 
 // ========== ENTRY POINT ==========
 drawCanvas();
+saveState();
 init();
