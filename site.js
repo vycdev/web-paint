@@ -1,8 +1,17 @@
-let rgbaColor = "rgba(0,0,0,1)"; ///Selected rgba color in string format
-let brushSize = "10"; /// brush size in string format
-let brushType = "brush"; /// brush type (brush.eraser.bucket,colorPick)
-let rgbaArr = [0, 0, 0, 1]; //// current selected rgba color in array format
-let isDone = true;
+// Made by:
+//     SANDU Victor Iulian
+//     VLAD Liviu Alexandru
+//     SIMION Cristina Florentina
+
+// Table of contents:
+//    Hint: CTRL+F to find the section
+//     
+//    ELEMENTS
+//    VARIABLES
+//    FUNCTIONS
+//    EVENTS
+
+// ========== ELEMENTS ==========
 
 let brushSizeInput = document.getElementById("brushSizeInput");
 let brushElement = document.getElementById("brush");
@@ -22,6 +31,22 @@ let reset = document.getElementById("canvasReset");
 let pickColor = document.getElementById("pickColor");
 let rainbow = document.getElementById("rainbowCheckbox");
 let valueSpeedBox = document.getElementById("valueSpeedBox");
+let picker = new Picker({
+    parent: document.querySelector("#colorPicker"),
+    popup: "bottom",
+    color: "#000",
+    editor: true,
+    layout: "default",
+    editorFormat: "hex",
+});
+
+
+// ========== VARIABLES ==========
+let rgbaColor = "rgba(0,0,0,1)"; ///Selected rgba color in string format
+let brushSize = "10"; /// brush size in string format
+let brushType = "brush"; /// brush type (brush.eraser.bucket,colorPick)
+let rgbaArr = [0, 0, 0, 1]; //// current selected rgba color in array format
+let isDone = true;
 
 let mousePressed = false;
 let lastX, lastY;
@@ -37,219 +62,21 @@ let initialSizes = {
     height: canvas.getBoundingClientRect().height,
 };
 
-window.onresize = () => {
-    initialSizes = {
-        width: canvas.getBoundingClientRect().width,
-        height: canvas.getBoundingClientRect().height,
-    };
+// ========== FUNCTIONS ==========
 
-    ctx.scale(
-        sizes.width / initialSizes.width,
-        sizes.height / initialSizes.height
-    );
+function showColorOnPickIcon(x, y, showColor) {
+    if (showColor) {
+        let imageData = ctx.getImageData(x, y, 1, 1);
+        imageData = "rgba(" + imageData.data.toString() + ")";
+        if (imageData == "rgba(0,0,0,0)") {
+            imageData = "rgba(255,255,255,1)";
+        }
 
-    drawCanvas();
-};
-
-function drawCanvas() {
-    canvas.width = sizes.width;
-    canvas.height = sizes.height;
-    ctx.scale(
-        sizes.width / initialSizes.width,
-        sizes.height / initialSizes.height
-    );
-
-    ctx.fillStyle = "rgba(255,255,255,1)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-drawCanvas();
-init();
-
-///Reset canvas button
-reset.onclick = () => {
-    drawCanvas();
-};
-
-// Download and Upload
-function convertImageToCanvas(image) {
-    let canvas = document.getElementById("canvas");
-    let ctx = canvas.getContext("2d");
-    let reader = new FileReader();
-    reader.onload = function (event) {
-        let img = new Image();
-        img.onload = function () {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        };
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(image[0]);
-    uploadBox.style.display = "none";
-}
-
-function convertCanvasToImage(canvas) {
-    let image = new Image();
-    image.src = canvas.toDataURL("image/png");
-    return image;
-}
-
-uploadImg.onclick = () => {
-    if (uploadBox.style.display == "none") {
-        uploadBox.style.display = "block";
-
-        closeUploadButton.onclick = () => {
-            uploadBox.style.display = "none";
-        };
+        pickColor.style.color = imageData;
     } else {
-        uploadBox.style.display = "none";
+        pickColor.style.color = "white";
     }
-};
-
-submitButton.onclick = () => {
-    if (fileInput.files[0]) {
-        convertImageToCanvas(fileInput.files);
-    } else {
-        alert("Please select an image");
-    }
-};
-
-function downloadImage() {
-    let canvas = document.getElementById("canvas");
-    let downImg = document.getElementById("downImg");
-    downImg.href = convertCanvasToImage(canvas).src;
 }
-
-downloadButton.onclick = () => {
-    downloadImage();
-};
-
-//Color picker
-let picker = new Picker({
-    parent: document.querySelector("#colorPicker"),
-    popup: "bottom",
-    color: "#000",
-    editor: true,
-    layout: "default",
-    editorFormat: "hex",
-});
-
-picker.onChange = (color) => {
-    rgbaColor = "rgba(" + color.rgba.toString() + ")";
-    rgbaArr = color.rgba;
-    document.getElementById("colorBox").style.background = rgbaColor;
-    selectBrushBrush();
-};
-
-/// Pick a color from canvas
-
-pickColor.onclick = () => {
-    canvas.style.cursor = "url('cursor/pick.cur'),auto";
-    brushType = "colorPick";
-    rainbow.checked = false;
-};
-
-//brush size
-function selectBrushBrush() {
-    canvas.style.cursor = "url('cursor/crosshair.cur'),auto";
-    brushType = "brush";
-    rainbow.checked = false;
-}
-
-brushElement.onclick = () => {
-    selectBrushBrush();
-};
-
-rangeInput.oninput = () => {
-    numberInput.value = rangeInput.value + "px";
-    brushSize = rangeInput.value;
-};
-
-eraser.onclick = () => {
-    canvas.style.cursor = "url('cursor/eraser.cur'),auto";
-    brushType = "eraser";
-    rainbow.checked = false;
-};
-
-//paint bucket
-
-bucket.onclick = () => {
-    canvas.style.cursor = "url('cursor/bucket.cur'),auto";
-    brushType = "bucket";
-};
-
-///Actual Drawing
-
-function init() {
-    let bucketReady;
-    canvas.onmousedown = (e) => {
-        mousePressed = true;
-        if (isDone) {
-            bucketReady = true;
-        }
-        Draw(
-            e.pageX - canvas.offsetLeft,
-            e.pageY - canvas.offsetTop,
-            false,
-            brushType,
-            bucketReady
-        );
-    };
-    canvas.onmousemove = (e) => {
-        if (mousePressed) {
-            bucketReady = false;
-            Draw(
-                e.pageX - canvas.offsetLeft,
-                e.pageY - canvas.offsetTop,
-                true,
-                brushType,
-                bucketReady
-            );
-        }
-        if (brushType == "colorPick") {
-            showColorOnPickIcon(
-                e.pageX - canvas.offsetLeft,
-                e.pageY - canvas.offsetTop,
-                true
-            );
-        } else {
-            showColorOnPickIcon(
-                e.pageX - canvas.offsetLeft,
-                e.pageY - canvas.offsetTop,
-                false
-            );
-        }
-    };
-    canvas.onmouseup = () => {
-        mousePressed = false;
-        if (isDone) {
-            bucketReady = true;
-        }
-    };
-    canvas.onmouseout = () => {
-        bucketReady = false;
-        mousePressed = false;
-    };
-}
-
-rainbow.onclick = () => {
-    if (rainbow.checked) {
-        rgbaArr = [256, 1, 0, 1];
-        rgbaColor = "rgba(" + rgbaArr.toString() + ")";
-        document.getElementById("colorBox").style.background = rgbaColor;
-        valueSpeedBox.style.display = "inline-flex";
-    } else {
-        valueSpeedBox.style.display = "none";
-    }
-};
-
-valueSpeedBox.onchange = () => {
-    if (valueSpeedBox.value > 125) {
-        valueSpeedBox.value = 125;
-    }
-    if (valueSpeedBox.value < 1) {
-        valueSpeedBox.value = 1;
-    }
-};
 
 function rainbowColor() {
     let r, g, b;
@@ -315,51 +142,10 @@ function rainbowColor() {
     document.getElementById("colorBox").style.background = rgbaColor;
 }
 
-function Draw(x, y, isDown, brushType, bucketReady) {
-    if (isDown) {
-        if (brushType == "brush") {
-            ctx.beginPath();
-            if (rainbow.checked) {
-                ctx.strokeStyle = rgbaColor;
-                rainbowColor();
-            } else {
-                ctx.strokeStyle = rgbaColor;
-            }
-            ctx.lineWidth = brushSize;
-            ctx.lineJoin = "round";
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
-            ctx.closePath();
-            ctx.stroke();
-        }
-        if (brushType == "eraser") {
-            ctx.beginPath();
-            ctx.strokeStyle = "white";
-            ctx.lineWidth = brushSize;
-            ctx.lineJoin = "round";
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
-            ctx.closePath();
-            ctx.stroke();
-        }
-    }
-    if (brushType == "colorPick") {
-        let imageData = ctx.getImageData(x, y, 1, 1);
-        rgbaArr = imageData.data;
-        imageData = "rgba(" + imageData.data.toString() + ")";
-        if (imageData == "rgba(0,0,0,0)") {
-            imageData = "rgba(255,255,255,1)";
-        }
-        rgbaColor = imageData;
-        document.getElementById("colorBox").style.background = rgbaColor;
-        selectBrushBrush();
-    }
-    if (brushType == "bucket" && bucketReady) {
-        bucketFill(x, y);
-    }
-
-    lastX = x;
-    lastY = y;
+function selectBrushBrush() {
+    canvas.style.cursor = "url('cursor/crosshair.cur'),auto";
+    brushType = "brush";
+    rainbow.checked = false;
 }
 
 function bucketFill(startX, startY) {
@@ -418,38 +204,36 @@ function bucketFill(startX, startY) {
         }
     }
 
-    ctx.putImageData(colorLayer, 0, 0);
-
     function matchSelectedColor(pixelPos) {
         let r = colorLayer.data[pixelPos];
         let g = colorLayer.data[pixelPos + 1];
         let b = colorLayer.data[pixelPos + 2];
-
+    
         if (r == rgbaArr[0] && g == rgbaArr[1] && b == rgbaArr[2]) {
             return true;
         } else {
             return false;
         }
     }
-
+    
     function matchStartColor(pixelPos) {
         let r = colorLayer.data[pixelPos];
         let g = colorLayer.data[pixelPos + 1];
         let b = colorLayer.data[pixelPos + 2];
-
+    
         if (r == startR && g == startG && b == startB) {
             return true;
         } else {
             return false;
         }
     }
-
+    
     function colorPixel(pixelPos) {
         colorLayer.data[pixelPos] = rgbaArr[0];
         colorLayer.data[pixelPos + 1] = rgbaArr[1];
         colorLayer.data[pixelPos + 2] = rgbaArr[2];
         colorLayer.data[pixelPos + 3] = 255;
-
+    
         if (!matchStartColor(pixelPos - 4)) {
             colorLayer.data[pixelPos - 4] = rgbaArr[0];
             colorLayer.data[pixelPos + 1 - 4] = rgbaArr[1];
@@ -476,19 +260,259 @@ function bucketFill(startX, startY) {
         }
     }
 
+    ctx.putImageData(colorLayer, 0, 0);
+
     isDone = true;
 }
 
-function showColorOnPickIcon(x, y, showColor) {
-    if (showColor) {
+function Draw(x, y, isDown, brushType, bucketReady) {
+    if (isDown) {
+        if (brushType == "brush") {
+            ctx.beginPath();
+            if (rainbow.checked) {
+                ctx.strokeStyle = rgbaColor;
+                rainbowColor();
+            } else {
+                ctx.strokeStyle = rgbaColor;
+            }
+            ctx.lineWidth = brushSize;
+            ctx.lineJoin = "round";
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.closePath();
+            ctx.stroke();
+        }
+        if (brushType == "eraser") {
+            ctx.beginPath();
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = brushSize;
+            ctx.lineJoin = "round";
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.closePath();
+            ctx.stroke();
+        }
+    }
+    if (brushType == "colorPick") {
         let imageData = ctx.getImageData(x, y, 1, 1);
+        rgbaArr = imageData.data;
         imageData = "rgba(" + imageData.data.toString() + ")";
         if (imageData == "rgba(0,0,0,0)") {
             imageData = "rgba(255,255,255,1)";
         }
-
-        pickColor.style.color = imageData;
-    } else {
-        pickColor.style.color = "white";
+        rgbaColor = imageData;
+        document.getElementById("colorBox").style.background = rgbaColor;
+        selectBrushBrush();
     }
+    if (brushType == "bucket" && bucketReady) {
+        bucketFill(x, y);
+    }
+
+    lastX = x;
+    lastY = y;
 }
+
+
+
+function init() {
+    let bucketReady;
+    canvas.onmousedown = (e) => {
+        mousePressed = true;
+        if (isDone) {
+            bucketReady = true;
+        }
+        Draw(
+            e.pageX - canvas.offsetLeft,
+            e.pageY - canvas.offsetTop,
+            false,
+            brushType,
+            bucketReady
+        );
+    };
+    canvas.onmousemove = (e) => {
+        if (mousePressed) {
+            bucketReady = false;
+            Draw(
+                e.pageX - canvas.offsetLeft,
+                e.pageY - canvas.offsetTop,
+                true,
+                brushType,
+                bucketReady
+            );
+        }
+        if (brushType == "colorPick") {
+            showColorOnPickIcon(
+                e.pageX - canvas.offsetLeft,
+                e.pageY - canvas.offsetTop,
+                true
+            );
+        } else {
+            showColorOnPickIcon(
+                e.pageX - canvas.offsetLeft,
+                e.pageY - canvas.offsetTop,
+                false
+            );
+        }
+    };
+    canvas.onmouseup = () => {
+        mousePressed = false;
+        if (isDone) {
+            bucketReady = true;
+        }
+    };
+    canvas.onmouseout = () => {
+        bucketReady = false;
+        mousePressed = false;
+    };
+}
+
+function drawCanvas() {
+    canvas.width = sizes.width;
+    canvas.height = sizes.height;
+    ctx.scale(
+        sizes.width / initialSizes.width,
+        sizes.height / initialSizes.height
+    );
+
+    ctx.fillStyle = "rgba(255,255,255,1)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+
+
+// Download and Upload
+function convertImageToCanvas(image) {
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext("2d");
+    let reader = new FileReader();
+    reader.onload = function (event) {
+        let img = new Image();
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(image[0]);
+    uploadBox.style.display = "none";
+}
+
+function convertCanvasToImage(canvas) {
+    let image = new Image();
+    image.src = canvas.toDataURL("image/png");
+    return image;
+}
+
+function downloadImage() {
+    let canvas = document.getElementById("canvas");
+    let downImg = document.getElementById("downImg");
+    downImg.href = convertCanvasToImage(canvas).src;
+}
+
+// ========== EVENTS ==========
+
+window.onresize = () => {
+    initialSizes = {
+        width: canvas.getBoundingClientRect().width,
+        height: canvas.getBoundingClientRect().height,
+    };
+
+    ctx.scale(
+        sizes.width / initialSizes.width,
+        sizes.height / initialSizes.height
+    );
+
+    drawCanvas();
+};
+
+///Reset canvas button
+reset.onclick = () => {
+    drawCanvas();
+};
+
+uploadImg.onclick = () => {
+    if (uploadBox.style.display == "none") {
+        uploadBox.style.display = "block";
+
+        closeUploadButton.onclick = () => {
+            uploadBox.style.display = "none";
+        };
+    } else {
+        uploadBox.style.display = "none";
+    }
+};
+
+submitButton.onclick = () => {
+    if (fileInput.files[0]) {
+        convertImageToCanvas(fileInput.files);
+    } else {
+        alert("Please select an image");
+    }
+};
+
+downloadButton.onclick = () => {
+    downloadImage();
+};
+
+picker.onChange = (color) => {
+    rgbaColor = "rgba(" + color.rgba.toString() + ")";
+    rgbaArr = color.rgba;
+    document.getElementById("colorBox").style.background = rgbaColor;
+    selectBrushBrush();
+};
+
+/// Pick a color from canvas
+
+pickColor.onclick = () => {
+    canvas.style.cursor = "url('cursor/pick.cur'),auto";
+    brushType = "colorPick";
+    rainbow.checked = false;
+    console.log("debug")
+};
+
+brushElement.onclick = () => {
+    selectBrushBrush();
+};
+
+rangeInput.oninput = () => {
+    numberInput.value = rangeInput.value + "px";
+    brushSize = rangeInput.value;
+};
+
+eraser.onclick = () => {
+    canvas.style.cursor = "url('cursor/eraser.cur'),auto";
+    brushType = "eraser";
+    rainbow.checked = false;
+};
+
+//paint bucket
+
+bucket.onclick = () => {
+    canvas.style.cursor = "url('cursor/bucket.cur'),auto";
+    brushType = "bucket";
+};
+
+///Actual Drawing
+
+rainbow.onclick = () => {
+    if (rainbow.checked) {
+        rgbaArr = [256, 1, 0, 1];
+        rgbaColor = "rgba(" + rgbaArr.toString() + ")";
+        document.getElementById("colorBox").style.background = rgbaColor;
+        valueSpeedBox.style.display = "inline-flex";
+    } else {
+        valueSpeedBox.style.display = "none";
+    }
+};
+
+valueSpeedBox.onchange = () => {
+    if (valueSpeedBox.value > 125) {
+        valueSpeedBox.value = 125;
+    }
+    if (valueSpeedBox.value < 1) {
+        valueSpeedBox.value = 1;
+    }
+};
+
+// ========== ENTRY POINT ==========
+drawCanvas();
+init();
