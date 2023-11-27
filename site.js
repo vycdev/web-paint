@@ -395,7 +395,13 @@ function convertImageToCanvas(image) {
     reader.onload = function (event) {
         let img = new Image();
         img.onload = function () {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                img,
+                0,
+                0,
+                canvas.width / scales.x,
+                canvas.height / scales.y
+            );
         };
         img.src = event.target.result;
     };
