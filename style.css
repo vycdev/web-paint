@@ -114,3 +114,7 @@ body {
 .settingsContainer {
     color: white;
 }
+
+#downImg {
+    color: inherit; 
+}

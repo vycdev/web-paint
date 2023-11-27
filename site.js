@@ -324,7 +324,6 @@ function Draw(x, y, isDown, brushType, bucketReady) {
 function init() {
     let bucketReady;
     canvas.onmousedown = (e) => {
-        console.log(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
         mousePressed = true;
         if (isDone) {
             bucketReady = true;
@@ -476,7 +475,6 @@ pickColor.onclick = () => {
     canvas.style.cursor = "url('cursor/pick.cur'),auto";
     brushType = "colorPick";
     rainbow.checked = false;
-    console.log("debug");
 };
 
 brushElement.onclick = () => {
