@@ -5,7 +5,7 @@
 
 // Table of contents:
 //    Hint: CTRL+F to find the section
-//     
+//
 //    ELEMENTS
 //    VARIABLES
 //    FUNCTIONS
@@ -40,7 +40,6 @@ let picker = new Picker({
     editorFormat: "hex",
 });
 
-
 // ========== VARIABLES ==========
 let rgbaColor = "rgba(0,0,0,1)"; ///Selected rgba color in string format
 let brushSize = "10"; /// brush size in string format
@@ -62,6 +61,11 @@ let initialSizes = {
     height: canvas.getBoundingClientRect().height,
 };
 
+let scales = {
+    x: sizes.width / initialSizes.width,
+    y: sizes.height / initialSizes.height,
+};
+
 // ========== FUNCTIONS ==========
 
 function showColorOnPickIcon(x, y, showColor) {
@@ -72,7 +76,7 @@ function showColorOnPickIcon(x, y, showColor) {
             imageData = "rgba(255,255,255,1)";
         }
 
-        pickColor.style.color = imageData;
+        document.getElementById("colorBox").style.background = imageData;
     } else {
         pickColor.style.color = "white";
     }
@@ -208,32 +212,32 @@ function bucketFill(startX, startY) {
         let r = colorLayer.data[pixelPos];
         let g = colorLayer.data[pixelPos + 1];
         let b = colorLayer.data[pixelPos + 2];
-    
+
         if (r == rgbaArr[0] && g == rgbaArr[1] && b == rgbaArr[2]) {
             return true;
         } else {
             return false;
         }
     }
-    
+
     function matchStartColor(pixelPos) {
         let r = colorLayer.data[pixelPos];
         let g = colorLayer.data[pixelPos + 1];
         let b = colorLayer.data[pixelPos + 2];
-    
+
         if (r == startR && g == startG && b == startB) {
             return true;
         } else {
             return false;
         }
     }
-    
+
     function colorPixel(pixelPos) {
         colorLayer.data[pixelPos] = rgbaArr[0];
         colorLayer.data[pixelPos + 1] = rgbaArr[1];
         colorLayer.data[pixelPos + 2] = rgbaArr[2];
         colorLayer.data[pixelPos + 3] = 255;
-    
+
         if (!matchStartColor(pixelPos - 4)) {
             colorLayer.data[pixelPos - 4] = rgbaArr[0];
             colorLayer.data[pixelPos + 1 - 4] = rgbaArr[1];
@@ -294,7 +298,12 @@ function Draw(x, y, isDown, brushType, bucketReady) {
         }
     }
     if (brushType == "colorPick") {
-        let imageData = ctx.getImageData(x, y, 1, 1);
+        let imageData = ctx.getImageData(
+            Math.floor(x * scales.x),
+            Math.floor(y * scales.y),
+            1,
+            1
+        );
         rgbaArr = imageData.data;
         imageData = "rgba(" + imageData.data.toString() + ")";
         if (imageData == "rgba(0,0,0,0)") {
@@ -305,18 +314,17 @@ function Draw(x, y, isDown, brushType, bucketReady) {
         selectBrushBrush();
     }
     if (brushType == "bucket" && bucketReady) {
-        bucketFill(x, y);
+        bucketFill(Math.floor(x * scales.x), Math.floor(y * scales.y));
     }
 
     lastX = x;
     lastY = y;
 }
 
-
-
 function init() {
     let bucketReady;
     canvas.onmousedown = (e) => {
+        console.log(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
         mousePressed = true;
         if (isDone) {
             bucketReady = true;
@@ -342,14 +350,14 @@ function init() {
         }
         if (brushType == "colorPick") {
             showColorOnPickIcon(
-                e.pageX - canvas.offsetLeft,
-                e.pageY - canvas.offsetTop,
+                (e.pageX - canvas.offsetLeft) * scales.x,
+                (e.pageY - canvas.offsetTop) * scales.y,
                 true
             );
         } else {
             showColorOnPickIcon(
-                e.pageX - canvas.offsetLeft,
-                e.pageY - canvas.offsetTop,
+                (e.pageX - canvas.offsetLeft) * scales.x,
+                (e.pageY - canvas.offsetTop) * scales.y,
                 false
             );
         }
@@ -369,16 +377,16 @@ function init() {
 function drawCanvas() {
     canvas.width = sizes.width;
     canvas.height = sizes.height;
-    ctx.scale(
-        sizes.width / initialSizes.width,
-        sizes.height / initialSizes.height
-    );
+    scales = {
+        x: sizes.width / initialSizes.width,
+        y: sizes.height / initialSizes.height,
+    };
+
+    ctx.scale(scales.x, scales.y);
 
     ctx.fillStyle = "rgba(255,255,255,1)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
-
-
 
 // Download and Upload
 function convertImageToCanvas(image) {
@@ -416,10 +424,12 @@ window.onresize = () => {
         height: canvas.getBoundingClientRect().height,
     };
 
-    ctx.scale(
-        sizes.width / initialSizes.width,
-        sizes.height / initialSizes.height
-    );
+    scales = {
+        x: sizes.width / initialSizes.width,
+        y: sizes.height / initialSizes.height,
+    };
+
+    ctx.scale(scales.x, scales.y);
 
     drawCanvas();
 };
@@ -466,7 +476,7 @@ pickColor.onclick = () => {
     canvas.style.cursor = "url('cursor/pick.cur'),auto";
     brushType = "colorPick";
     rainbow.checked = false;
-    console.log("debug")
+    console.log("debug");
 };
 
 brushElement.onclick = () => {
