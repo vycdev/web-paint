@@ -460,8 +460,6 @@ function saveState() {
     }
 
     canvasStateIndex = 0;
-
-    console.log(canvasStateIndex, canvasStates);
 }
 
 function undo() {
@@ -480,8 +478,6 @@ function undo() {
             canvasStateIndex = canvasStates.length - 1;
         }
     }
-
-    console.log(canvasStateIndex, canvasStates);
 }
 
 function redo() {
@@ -499,8 +495,6 @@ function redo() {
             canvas.height / scales.y
         );
     }
-
-    console.log(canvasStateIndex, canvasStates);
 }
 
 // ========== EVENTS ==========
